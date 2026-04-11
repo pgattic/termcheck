@@ -4,10 +4,10 @@
     readOnly = [
       "/etc/resolv.conf"     # only if network is allowed
       "/etc/ssl/certs"
-      "$HOME/git/termcheck/yeet"
+      "./yeet"
     ];
     readWrite = [
-      "$HOME/git/termcheck" # the project the IDE works on
+      "." # the project the IDE works on
     ];
     # everything else is invisible to the sandbox
   };
@@ -19,14 +19,17 @@
     allowedHosts = [];
   };
 
-  # The sandbox PATH will contain only these
-  packages = [
-    "git"
-    "bash"
-    "coreutils"
-    "nodejs"
-    "neovim"
-  ];
+  # The sandbox's PATH will contain only these
+  packages = {
+    # Add some packages that most LLMs expect to be on a system. Still does not give them access to the internet!
+    allowDefaults = true;
+    allowed = [
+      "git"
+      "nodejs"
+      "neovim"
+      "xeyes"
+    ];
+  };
 
   # Command to spawn in the sandbox (can be a shell like `bash`)
   command = [ "bash" ];
