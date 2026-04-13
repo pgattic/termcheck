@@ -6,15 +6,19 @@ TermCheck combines Nix with BubbleWrap to generate declarative command wrappers 
 
 ## Current status
 
-This is an early Linux-only prototype. It can:
+This is an early prototype. On Linux it uses BubbleWrap; on macOS it uses Apple's deprecated `sandbox-exec` facility.
 
-- run a configured command inside a BubbleWrap sandbox
+It can:
+
+- run a configured command inside a sandbox
 - hide all filesystem paths except declared read-only and read-write mounts
 - disable networking, or preserve host networking when `network.enable = true`
 - expose only configured nixpkgs packages on `PATH`
 - validate policy shape at Nix evaluation time
 
-It does not yet provide strong executable allowlisting. The sandbox currently binds `/nix` read-only so allowed packages can run with their full runtime closures. Because of that, a process may still execute another binary by absolute `/nix/store/...` path if it can discover that path. Treat `packages.allowed` as a curated `PATH`, not as a complete command firewall.
+It does not yet provide strong executable allowlisting. The sandbox currently allows `/nix` read access so allowed packages can run with their full runtime closures. Because of that, a process may still execute another binary by absolute `/nix/store/...` path if it can discover that path. Treat `packages.allowed` as a curated `PATH`, not as a complete command firewall.
+
+The macOS backend is best-effort and less isolated than the Linux BubbleWrap backend. It uses a generated `sandbox-exec` profile to allow package/runtime reads, declared filesystem paths, and optional networking. Host allowlisting is still unsupported on macOS.
 
 ## Usage
 
@@ -94,4 +98,5 @@ The current check validates that the generated launcher is syntactically valid s
 - [ ] Restrict command patterns, such as disallowing `git rebase` while allowing other Git commands
 - [ ] Add graphical application support
 - [ ] Add host allowlisting through a proxy or firewall integration
-- [ ] Investigate macOS support with `sandbox-exec` or a replacement
+- [x] macOS support through `sandbox-exec`
+- [ ] Replace or harden the macOS backend if `sandbox-exec` is removed
